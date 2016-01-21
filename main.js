@@ -128,8 +128,8 @@ $("#go").click(function()
 								}
 		var node = sys.getNode("node_"+randomNumberNode);
 		console.log(node);
-		sys.tweenNode(node, 1, {color:"red", tvoya:"mamka"});
-		
+		//sys.tweenNode(node, 1, {color:"red", tvoya:"mamka"});
+		sys.redraw;
 	}
 );
 						
@@ -160,22 +160,26 @@ var timerId = setTimeout(function func() {
 								
 								function draw123()
 								{
-								 if (window.shift["node_"+randomNumberNode] >= randomNumberNode*10){clearInterval(window.timerId["node_"+randomNumberNode]);}
-								 
+								if (window.shift["node_"+randomNumberNode] >= randomNumberNode*10){clearInterval(window.timerId["node_"+randomNumberNode]);}
+								if (isNaN(window.shift["node_"+randomNumberNode])){return}
+								else
+								{
 								 if (randomNumberCase % 2 == 0)
 									{
-										 node.p.x = node.p.x + 0.3*(3/randomNumberPoM);
-										 node.p.y = node.p.y + 0.3*((-1*3)/randomNumberPoM);
-										 window.shift["node_"+randomNumberNode]++;
-										//console.log(window.shift["node_"+randomNumberNode]);
+										node.p.x = node.p.x + 0.3*(3/randomNumberPoM);
+										node.p.y = node.p.y + 0.3*((-1*3)/randomNumberPoM);
+										window.shift["node_"+randomNumberNode]++;
+										console.log(window.shift["node_"+randomNumberNode]);
+										
 									}
 								 else
-									 {
+									{
 										node.p.y = node.p.y + 0.3*(3/randomNumberPoM);
 										node.p.x = node.p.x + 0.3*((-1*3)/randomNumberPoM);
 										window.shift["node_"+randomNumberNode]++;
-										//console.log(window.shift["node_"+randomNumberNode]);
+										console.log(window.shift["node_"+randomNumberNode]);
 									}
+								}
 								
 								}
 								
@@ -183,7 +187,7 @@ var timerId = setTimeout(function func() {
 									console.log("randomNumberPom="+randomNumberPoM);
 									console.log("randomNumberNode="+randomNumberNode);
 									console.log("randomNumberCase="+randomNumberCase);
-									if (randomNumberNode != 0, randomNumberCase != 0, randomNumberPoM !=0)
+									if (randomNumberNode != 0, randomNumberCase != 0, randomNumberPoM !=0, window.shift["node_"+randomNumberNode] != NaN)
 									{
 										
 										window.shift["node_"+randomNumberNode] = 0;
@@ -191,8 +195,8 @@ var timerId = setTimeout(function func() {
                                         
 										//console.log(window.timerId);
 									}
-								timerId = setTimeout(func, 122000);
-},122000);
+								timerId = setTimeout(func, 3000);
+},3000);
 
 
   
