@@ -13,7 +13,6 @@
     particleSystem.screenPadding(80);
     that.initMouseHandling();
    },
-      
    redraw:function(){
     //действия при перересовке
     ctx.fillStyle = "white"; //белым цветом
@@ -21,8 +20,8 @@
    
     particleSystem.eachEdge( //отрисуем каждую грань
      function(edge, pt1, pt2){ //будем работать с гранями и точками её начала и конца
-      ctx.strokeStyle = "rgba(0,0,0, .333)"; //грани будут чёрным цветом с некой прозрачностью
-      ctx.lineWidth = 1; //толщиной в один пиксель
+      ctx.strokeStyle = "#d2eab5"; //грани будут чёрным цветом с некой прозрачностью
+      ctx.lineWidth = 2; //толщиной в один пиксель
       ctx.beginPath();  //начинаем рисовать
       ctx.moveTo(pt1.x, pt1.y); //от точки один
       ctx.lineTo(pt2.x, pt2.y); //до точки два
@@ -32,11 +31,24 @@
     particleSystem.eachNode( //теперь каждую вершину
      function(node, pt){  //получаем вершину и точку где она
       var w = 5;   //ширина квадрата
+	  /* квадратики
       ctx.fillStyle = "black"; //с его цветом понятно
       ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w); //рисуем
       ctx.fillStyle = ""; //цвет для шрифта
       ctx.font = 'italic 13px sans-serif'; //шрифт
       ctx.fillText (node.name, pt.x+8, pt.y+8); //пишем имя у каждой точки
+	  */
+	  ctx.beginPath();
+      ctx.arc(pt.x, pt.y, w, 0, 2 * Math.PI, false);
+      ctx.fillStyle = "#d2eab5";
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#003300';
+      ctx.stroke();
+	  ctx.fillStyle = "black";
+	  ctx.font = 'italic 13px sans-serif'; //шрифт
+      ctx.fillText (node.name, pt.x+8, pt.y+8); //пишем имя у каждой точки
+	  
     });       
    },
   
@@ -128,26 +140,25 @@ function shiftNode(nodeId, min, max) {
 	if (isNaN(window.shifts[nodeName]))
 		window.shifts[nodeName] = 0;
 
-	var randomNumberCase = rand(min, max);
 	var PoM = rand(-max, max);
 	if(PoM == 0) PoM = 1;
 	var newX = node.p.x;
 	var newY = node.p.y;
-	if (randomNumberCase % 2 == 0)
+	
+	// вычисляем новые координаты для узла
+	if (rand(1, 2)%2===0)
 	{
-		// вычисляем новые координаты для узла
-		newX += 0.3*(3/PoM);
-		newY += 0.3*((-1*3)/PoM);
-	}
-	else
-	{
-		// вычисляем новые координаты для узла
 		newY += 0.3*(3/PoM);
 		newX += + 0.3*((-1*3)/PoM);
 	}
+	else
+	{
+		newX += 0.3*(3/PoM);
+		newY += 0.3*((-1*3)/PoM);
+	}
 	//console.log("node:", nodeId, " set(x:", newX, ", y:", newY, ")")
 	node.p.x = newX;
-	node.p.Y = newY;
+	node.p.y = newY;
 	
 	// увеличиваем счетчик сдвигов
 	window.shifts[nodeName]++;
@@ -175,7 +186,7 @@ function recursiveShift() {
 	if (nodeId != 0)
 	{
 		window.shifts[nodeName] = 0;
-		window.timers[nodeName] = setInterval(function(){shiftNode(nodeId, min, max);}, 10)
+		window.timers[nodeName] = setInterval(function(){shiftNode(nodeId, min, max);}, 100)
 	}
 	setTimeout(recursiveShift, 3000);
 }
