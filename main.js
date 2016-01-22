@@ -100,7 +100,7 @@
 
  function initArbor(){
 	sys = arbor.ParticleSystem(1000); // создаём систему
-	sys.parameters({gravity:false,friction:0.001,repulsion:10000,dt:0.0032}); // гравитация выкл
+	sys.parameters({gravity:false,friction:0.001,repulsion:10000,dt:0.0022}); // гравитация выкл
 	sys.renderer = $(this).Renderer("#canvas"); //начинаем рисовать в выбраной области
 
 	$.getJSON("data.json", //получаем с сервера файл с данными
@@ -131,7 +131,7 @@ window.shifts = [];
 //таймеры для узлов
 window.timers = [];
 
-function shiftNode(nodeId, min, max) {
+function shiftNode(nodeId, min, max, rndcase) {
 	var nodeName = "node_" + nodeId;
 
 	var node = sys.getNode(nodeName);
@@ -140,23 +140,29 @@ function shiftNode(nodeId, min, max) {
 	if (isNaN(window.shifts[nodeName]))
 		window.shifts[nodeName] = 0;
 
-	var PoM = rand(-max, max);
+	if (window.shifts[nodeName] >= 100){
+		clearInterval(window.timers[nodeName]);
+		window.shifts[nodeName] = 0;
+	}
+	
+	var PoM = rand(min-11, max);
 	if(PoM == 0) PoM = 1;
 	var newX = node.p.x;
 	var newY = node.p.y;
 	
 	// вычисляем новые координаты для узла
-	if (rand(1, 2)%2===0)
+	if (rndcase%2==0)
 	{
-		newY += 0.3*(3/PoM);
-		newX += + 0.3*((-1*3)/PoM);
+		newY += 0.1;//0.3*(3/PoM);
+		//newX += 0.3*((-1*3)/PoM);
 	}
 	else
 	{
-		newX += 0.3*(3/PoM);
-		newY += 0.3*((-1*3)/PoM);
+		newX += 0.1;//0.3*(3/PoM);
+		//newY += 0.3*((-1*3)/PoM);
 	}
-	//console.log("node:", nodeId, " set(x:", newX, ", y:", newY, ")")
+	//console.log(0.3*(3/PoM), 0.3*((-1*3)/PoM));
+	//console.log(rndcase, "node:", nodeId, " set(x:", newX, ", y:", newY, ")")
 	node.p.x = newX;
 	node.p.y = newY;
 	
@@ -169,26 +175,17 @@ function recursiveShift() {
 	
 	var min = 1;
 	var max = 10;
-	
-	// если узел подвинули N раз, то останаливаем таймер
-	// todo - нужно знать количество узлов
-	for(var i=1;i<=10;i++){
-		if (window.shifts["node_" + i] >= i * 10){
-			clearInterval(window.timers["node_" + i]);
-			window.shifts["node_" + i] = 0;
-		}
-	}
-
 	var nodeId = rand(min, max);
-							
+	// если узел подвинули N раз, то останаливаем таймер
+					
 	var nodeName = "node_" + nodeId;
-	
+	var rc = rand(1, 2);
 	if (nodeId != 0)
 	{
 		window.shifts[nodeName] = 0;
-		window.timers[nodeName] = setInterval(function(){shiftNode(nodeId, min, max);}, 100)
+		window.timers[nodeName] = setInterval(function(){shiftNode(nodeId, min, max, rc);}, 10)
 	}
-	setTimeout(recursiveShift, 3000);
+	//setTimeout(recursiveShift, 3000);
 }
 
 
