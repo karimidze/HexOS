@@ -1,18 +1,18 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
-   "http://www.w3.org/TR/html4/strict.dtd">
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Graph 0.1</title>
-</head>
-<body>
-  <canvas id="viewport" width="800" height="600"></canvas>
-  <button style="background-color:red" id="go">Go</button>
   <script src="js/jquery-2.2.0.min.js"></script>
   <script src="lib/arbor.js"></script>
   <script src="lib/arbor-tween.js"></script>
   <script src="main.js"></script>
-
+</head>
+<body>
+  <canvas id="canvas" width="800" height="600"></canvas>
+  
+  <button style="padding:3px 10px;" id="btnInit" onclick="initArbor()">Init</button>
+  <button style="padding:3px 10px;" id="btnStart" onclick="recursiveShift()">Start</button>
+  <button style="padding:3px 10px;" id="btnRndShift" onclick="rndShift()">random shift</button>
 </body>
 </html>

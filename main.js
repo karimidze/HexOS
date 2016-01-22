@@ -1,5 +1,5 @@
 (function($){
- var Renderer = function(canvas)
+ $.fn.Renderer = function(canvas)
  {
   var canvas = $(canvas).get(0);
   var ctx = canvas.getContext("2d");
@@ -83,127 +83,105 @@
   }
   return that;
  }    
-
- $(document).ready(function(){
-  sys = arbor.ParticleSystem(1000); // создаём систему
-  sys.parameters({gravity:false,friction:0.001,repulsion:10000,dt:0.0032}); // гравитация выкл
-  sys.renderer = Renderer("#viewport") //начинаем рисовать в выбраной области
-
-  $.getJSON("data.json", //получаем с сервера файл с данными
-   function(data){
-    $.each(data.nodes, function(i,node){
-     sys.addNode(node.name); //добавляем вершину
-    });
-    
-    $.each(data.edges, function(i,edge){
-     sys.addEdge(sys.getNode(edge.src),sys.getNode(edge.dest)); //добавляем грань
-    });
-  });
   
+})(this.jQuery)
 
-$("#go").click(function() 
-	{
-		//var kek = 1;
-		//console.table(window.timerId);
-		//for (kek=1; kek <= 10; kek++)
-		//{
-			//clearInterval(window.timerId["node_"+kek]);
-			//console.log("timerId="+window.timerId["node_"+kek]);
-			//console.log("shift="+window.shift["node_"+kek]);
-		//}
-		var minNumber = 1;
-								var maxNumber = 10;
-								var randomNumberNode = 0;
-								var randomNumberCase = 0;
-								var randomNumberPoM = 0;
-								randomNumberFromRange(minNumber, maxNumber);
-								
-								function randomNumberFromRange(min,max)
-								{
-									randomNumberNode = Math.floor(Math.random()*(max-min+1)+min);
-									
-									randomNumberCase = Math.floor(Math.random()*(max-min+1)+min);
-									
-									randomNumberPoM = Math.floor(Math.random()*(max-(min-11)+1)+(min-11));
-								}
-		var node = sys.getNode("node_"+randomNumberNode);
-		console.log(node);
-		//sys.tweenNode(node, 1, {color:"red", tvoya:"mamka"});
-		sys.redraw;
-	}
-);
-						
-						
+ function initArbor(){
+	sys = arbor.ParticleSystem(1000); // создаём систему
+	sys.parameters({gravity:false,friction:0.001,repulsion:10000,dt:0.0032}); // гравитация выкл
+	sys.renderer = $(this).Renderer("#canvas"); //начинаем рисовать в выбраной области
+
+	$.getJSON("data.json", //получаем с сервера файл с данными
+		function(data){
+		$.each(data.nodes, function(i,node){
+			sys.addNode(node.name); //добавляем вершину
+		});
+		
+		$.each(data.edges, function(i,edge){
+			sys.addEdge(sys.getNode(edge.src),sys.getNode(edge.dest)); //добавляем грань
+		});
+		}
+	);
+ }
+
+function rndShift(){	
+	shiftNode(rand(1, 10), 1, 10);
+}
+
 //### Рекурсивный вызов сдвигов ###
 
-var timerId = setTimeout(function func() {
-								window.shift=[];
-								window.timerId = [];
-								
-								var minNumber = 1;
-								var maxNumber = 10;
-								var randomNumberNode = 0;
-								var randomNumberCase = 0;
-								var randomNumberPoM = 0;
-								randomNumberFromRange(minNumber, maxNumber);
-								
-								function randomNumberFromRange(min,max)
-								{
-									randomNumberNode = Math.floor(Math.random()*(max-min+1)+min);
-									
-									randomNumberCase = Math.floor(Math.random()*(max-min+1)+min);
-									
-									randomNumberPoM = Math.floor(Math.random()*(max-(min-11)+1)+(min-11));
-								}
-								
-								var node = sys.getNode("node_"+randomNumberNode);
-								
-								function draw123()
-								{
-								if (window.shift["node_"+randomNumberNode] >= randomNumberNode*10){clearInterval(window.timerId["node_"+randomNumberNode]);}
-								if (isNaN(window.shift["node_"+randomNumberNode])){return}
-								else
-								{
-								 if (randomNumberCase % 2 == 0)
-									{
-										node.p.x = node.p.x + 0.3*(3/randomNumberPoM);
-										node.p.y = node.p.y + 0.3*((-1*3)/randomNumberPoM);
-										window.shift["node_"+randomNumberNode]++;
-										console.log(window.shift["node_"+randomNumberNode]);
-										
-									}
-								 else
-									{
-										node.p.y = node.p.y + 0.3*(3/randomNumberPoM);
-										node.p.x = node.p.x + 0.3*((-1*3)/randomNumberPoM);
-										window.shift["node_"+randomNumberNode]++;
-										console.log(window.shift["node_"+randomNumberNode]);
-									}
-								}
-								
-								}
-								
-									//console.clear();
-									console.log("randomNumberPom="+randomNumberPoM);
-									console.log("randomNumberNode="+randomNumberNode);
-									console.log("randomNumberCase="+randomNumberCase);
-									if (randomNumberNode != 0, randomNumberCase != 0, randomNumberPoM !=0, window.shift["node_"+randomNumberNode] != NaN)
-									{
-										
-										window.shift["node_"+randomNumberNode] = 0;
-										window.timerId["node_"+randomNumberNode] = setInterval(function(){draw123();}, 1)
-                                        
-										//console.log(window.timerId);
-									}
-								timerId = setTimeout(func, 3000);
-},3000);
+function rand(min,max) {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+//количество сдвигов для узлов
+window.shifts = [];
+//таймеры для узлов
+window.timers = [];
+
+function shiftNode(nodeId, min, max) {
+	var nodeName = "node_" + nodeId;
+
+	var node = sys.getNode(nodeName);
+	
+	// если в узле вдруг NaN, то ставим 0
+	if (isNaN(window.shifts[nodeName]))
+		window.shifts[nodeName] = 0;
+
+	var randomNumberCase = rand(min, max);
+	var PoM = rand(-max, max);
+	if(PoM == 0) PoM = 1;
+	var newX = node.p.x;
+	var newY = node.p.y;
+	if (randomNumberCase % 2 == 0)
+	{
+		// вычисляем новые координаты для узла
+		newX += 0.3*(3/PoM);
+		newY += 0.3*((-1*3)/PoM);
+	}
+	else
+	{
+		// вычисляем новые координаты для узла
+		newY += 0.3*(3/PoM);
+		newX += + 0.3*((-1*3)/PoM);
+	}
+	//console.log("node:", nodeId, " set(x:", newX, ", y:", newY, ")")
+	node.p.x = newX;
+	node.p.Y = newY;
+	
+	// увеличиваем счетчик сдвигов
+	window.shifts[nodeName]++;
+	return window.shifts[nodeName];
+}
+
+function recursiveShift() {
+	
+	var min = 1;
+	var max = 10;
+	
+	// если узел подвинули N раз, то останаливаем таймер
+	// todo - нужно знать количество узлов
+	for(var i=1;i<=10;i++){
+		if (window.shifts["node_" + i] >= i * 10){
+			clearInterval(window.timers["node_" + i]);
+			window.shifts["node_" + i] = 0;
+		}
+	}
+
+	var nodeId = rand(min, max);
+							
+	var nodeName = "node_" + nodeId;
+	
+	if (nodeId != 0)
+	{
+		window.shifts[nodeName] = 0;
+		window.timers[nodeName] = setInterval(function(){shiftNode(nodeId, min, max);}, 10)
+	}
+	setTimeout(recursiveShift, 3000);
+}
 
 
   
   
-  
- })
 
- 
-})(this.jQuery)
 
