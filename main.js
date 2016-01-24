@@ -185,11 +185,24 @@ function recursiveShift() {
 		window.shifts[nodeName] = 0;
 		window.timers[nodeName] = setInterval(function(){shiftNode(nodeId, min, max, rc);}, 10)
 	}
-	//setTimeout(recursiveShift, 3000);
+	timerId = setTimeout(recursiveShift, 3000);
 }
 
+function del()
+{
+	var i = 1;
+	for (i =1; i<=10; i++)
+	{
+		var node = sys.getNode("node_"+i);
+		sys.pruneNode(node);
+	}
+}
 
-  
-  
+function loop(){
+var timerId = setTimeout(recursiveShift(),3000);
+}
 
-
+function add(){
+	var i = 11;
+	sys.addNode("node_"+i);
+}
